@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const mongoose = require('mongoose')
 require('dotenv').config()
+const authRoute = require('./routes').auth
 
 // connect to DB
 mongoose
@@ -18,6 +19,7 @@ mongoose
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use('/api/user', authRoute)
 
 app.listen(8080, () => {
   console.log('Server running on port 8080.')
