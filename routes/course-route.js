@@ -19,7 +19,7 @@ router.get('/', (req, res) => {
 })
 
 router.get('/:_id', (req, res) => {
-  let { _id } = req.params
+  const { _id } = req.params
   Course.findOne({ _id })
     .populate('instructor', ['email'])
     .then(course => {
@@ -35,12 +35,12 @@ router.post('/', async (req, res) => {
   const { error } = courseValidation(req.body)
   if (error) return res.status(400).send(error.details[0].message)
 
-  let { title, description, price } = req.body
+  const { title, description, price } = req.body
   if (req.user.isStudent()) {
     return res.status(400).send('Only instructor can post a new course.')
   }
 
-  let newCourse = new Course({
+  const newCourse = new Course({
     title,
     description,
     price,
@@ -60,8 +60,8 @@ router.patch('/:_id', async (req, res) => {
   const { error } = courseValidation(req.body)
   if (error) return res.status(400).send(error.details[0].message)
 
-  let { _id } = req.params
-  let course = await Course.findOne({ _id })
+  const { _id } = req.params
+  const course = await Course.findOne({ _id })
   if (!course) {
     res.status(404)
     return res.json({
@@ -95,8 +95,8 @@ router.patch('/:_id', async (req, res) => {
 })
 
 router.delete('/:_id', async (req, res) => {
-  let { _id } = req.params
-  let course = await Course.findOne({ _id })
+  const { _id } = req.params
+  const course = await Course.findOne({ _id })
   if (!course) {
     res.status(404)
     return res.json({

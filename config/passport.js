@@ -3,7 +3,7 @@ const ExtractJwt = require('passport-jwt').ExtractJwt
 const User = require('../models').userModel
 
 module.exports = passport => {
-  let opts = {}
+  const opts = {}
   opts.jwtFromRequest = ExtractJwt.fromAuthHeaderWithScheme('jwt')
   opts.secretOrKey = process.env.PASSPORT_SECRET
   passport.use(
