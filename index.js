@@ -6,6 +6,14 @@ const authRoute = require('./routes').auth
 const courseRoute = require('./routes').course
 const passport = require('passport')
 require('./config/passport')(passport)
+const cors = require('cors')
+
+const corsObj = {
+  origin: '*',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+}
 
 // connect to DB
 mongoose
@@ -22,6 +30,7 @@ mongoose
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(cors(corsObj))
 app.use('/api/user', authRoute)
 app.use(
   '/api/courses',
