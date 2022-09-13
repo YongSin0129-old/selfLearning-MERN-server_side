@@ -3,21 +3,45 @@ const Course = require('../models').courseModel
 const courseValidation = require('../validation').courseValidation
 
 router.use((req, res, next) => {
-  console.log('A request is coming into api...')
+  console.log('A request is coming into courseApi...')
   next()
 })
-
-router.get('/', (req, res) => {
-  Course.find({})
+/********************************************************************************
+*
+學生查課
+*
+*********************************************************************************/
+router.get('/coursesByStudentId/:_id', (req, res) => {
+  const { _id } = req.params
+  Course.find({ student: _id })
     .populate('instructor', ['username', 'email'])
-    .then(course => {
-      res.send(course)
+    .then(courses => {
+      res.send(courses)
     })
-    .catch(() => {
-      res.status(500).send('Error!! Cannot get course!!')
+    .catch(e => {
+      res.send(e)
     })
 })
-
+/********************************************************************************
+*
+學生選課
+*
+*********************************************************************************/
+router.post('/coursesByStudentId', async (req, res) => {
+  const { studentId, courseId } = req.body
+  const course = await Course.findOne({ _id: courseId })
+  if (course.student.includes(studentId)) {
+    return res.status(500).send('此學生已經註冊課程')
+  }
+  course.student.push(studentId)
+  await course.save()
+  res.status(200).send(course)
+})
+/********************************************************************************
+*
+老師查課
+*
+*********************************************************************************/
 router.get('/:_id', (req, res) => {
   const { _id } = req.params
   Course.findOne({ _id })
@@ -29,7 +53,26 @@ router.get('/:_id', (req, res) => {
       res.send(e)
     })
 })
-
+/********************************************************************************
+*
+一次取得所有課程資料
+*
+*********************************************************************************/
+router.get('/', (req, res) => {
+  Course.find({})
+    .populate('instructor', ['username', 'email'])
+    .then(course => {
+      res.send(course)
+    })
+    .catch(() => {
+      res.status(500).send('Error!! Cannot get course!!')
+    })
+})
+/********************************************************************************
+*
+老師添加課程
+*
+*********************************************************************************/
 router.post('/', async (req, res) => {
   // validate the inputs before making a new course
   const { error } = courseValidation(req.body)
@@ -54,7 +97,11 @@ router.post('/', async (req, res) => {
     res.status(400).send('Cannot save course.')
   }
 })
-
+/********************************************************************************
+*
+老師更新課程資料
+*
+*********************************************************************************/
 router.patch('/:_id', async (req, res) => {
   // validate the inputs before making a new course
   const { error } = courseValidation(req.body)
@@ -93,7 +140,11 @@ router.patch('/:_id', async (req, res) => {
     })
   }
 })
-
+/********************************************************************************
+*
+老師刪除課程
+*
+*********************************************************************************/
 router.delete('/:_id', async (req, res) => {
   const { _id } = req.params
   const course = await Course.findOne({ _id })
